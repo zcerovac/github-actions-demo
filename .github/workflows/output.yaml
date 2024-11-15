@@ -1,4 +1,4 @@
-name: Output information
+name: Output Information
 on: workflow_dispatch
 jobs:
   info:

@@ -1,4 +1,4 @@
-name: Deploy Project
+name: First Deploy Project
 on: workflow_dispatch
 jobs:
   test:
