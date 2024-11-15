@@ -1,31 +1,8 @@
-name: First Deploy Project
+name: Output Information
 on: workflow_dispatch
 jobs:
-  test:
+  info:
     runs-on: ubuntu-latest
     steps:
-      - name: Get Code
-        uses: actions/checkout@v3
-      - name: Install NodeJS
-        uses: actions/setup-node@v3
-        with:
-          node-version: 20
-      - name: Install dependecies
-        run: npm ci
-      - name: Run tests
-        run: npm test
-  deploy:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Get Code
-        uses: actions/checkout@v3
-      - name: Install NodeJS
-        uses: actions/setup-node@v3
-        with:
-          node-version: 20
-      - name: Install dependecies
-        run: npm ci
-      - name: Deploy
-        run: echo "Deploying..."
-
+      - name: Output GitHub context
+        run: echo "${{ toJSON(github) }}"
