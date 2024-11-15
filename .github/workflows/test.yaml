@@ -1,10 +1,31 @@
-name: Test workflow
+name: First Deploy Project
 on: workflow_dispatch
-jobs: 
+jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - name: Printing hello
-        run: echo "Hello World!"
-      - name: Printing godbay
-        run: echo "Goodbuy!"
+      - name: Get Code
+        uses: actions/checkout@v3
+      - name: Install NodeJS
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+      - name: Install dependecies
+        run: npm ci
+      - name: Run tests
+        run: npm test
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get Code
+        uses: actions/checkout@v3
+      - name: Install NodeJS
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+      - name: Install dependecies
+        run: npm ci
+      - name: Deploy
+        run: echo "Deploying..."
+
