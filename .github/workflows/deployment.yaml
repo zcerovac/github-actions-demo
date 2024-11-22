@@ -8,6 +8,9 @@ on:
         required: true
         default: '09:25'  # Podrazumevano vreme je 5 PM
 
+#on:
+#  schedule:
+#    - cron: '25 08 * * *'   # Pokreni workflow svakog dana u 08:25 UTC (što je 10:25 u Srbiji)
 
 jobs:
   test:
@@ -35,7 +38,21 @@ jobs:
           node-version: 20
       - name: Install dependecies
         run: npm ci
-      - name: Run tests
-        run: npm test
+      - name: Wait for release time
+        run: |
+          # Preuzmi korisničko vreme i trenutno vreme u UTC
+          release_time="${{ github.event.inputs.release-time }}"
+          current_time=$(date -u +"%H:%M")
+          
+          echo "Current time (UTC): $current_time"
+          echo "Target release time (UTC): $release_time"
+          
+          # Ako je trenutni trenutak manji od ciljanog vremena, čekaj
+          while [ "$current_time" != "$release_time" ]; do
+            echo "Waiting until $release_time..."
+            sleep 60  # Čekaj 1 minut
+            current_time=$(date -u +"%H:%M")
+          done
+          echo "It's time to deploy!"
       - name: Deploy
         run: echo "Deploying..."
