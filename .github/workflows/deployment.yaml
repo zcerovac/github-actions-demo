@@ -6,7 +6,7 @@ on:
       release-time:
         description: 'Time to wait before release (UTC, format HH:mm)'
         required: true
-        default: '17:00'  # Podrazumevano vreme je 5 PM
+        default: '09:25'  # Podrazumevano vreme je 5 PM
 
 
 jobs:
