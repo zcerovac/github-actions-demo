@@ -1,5 +1,12 @@
 name: Deploy Project
-on: workflow_dispatch
+on: 
+  workflow_dispatch
+    inputs:
+      release-time:
+        description: 'Time to wait before release (UTC, format HH:mm)'
+        required: true
+        default: '17:00'  # Podrazumevano vreme je 5 PM
+
 jobs:
   test:
     runs-on: ubuntu-latest
