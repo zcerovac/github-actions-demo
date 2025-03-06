@@ -1,58 +1,31 @@
-name: Deploy Project
-
+name: Events Demo 
 on:
+  pull_request:
+    types:
+      - opened
+    branches:
+      - master 
+      - 'dev-*' # dev-new dev-this-is-new
   workflow_dispatch:
-    inputs:
-      release-time:
-        description: 'Time to wait before release (UTC, format HH:mm)'
-        required: true
-        default: '09:25'  #  jedan sat unazad
-
-#on:
-#  schedule:
-#    - cron: '25 08 * * *'   # Pokreni workflow svakog dana u 08:25 UTC (što je 10:25 u Srbiji)
-
+  push:
+    branches:
+      - master
+      - 'dev-*' # dev-new dev-this-is-new
+    paths-ignore:
+      - '.github/workflows/*'
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Get Code
-        uses: actions/checkout@v4
-      - name: Install NodeJS
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - name: Install dependecies
-        run: npm ci
-      - name: Run tests
-        run: npm test
   deploy:
-    needs: test
     runs-on: ubuntu-latest
     steps:
-      - name: Get Code
-        uses: actions/checkout@v4
-      - name: Install NodeJS
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - name: Install dependecies
+      - name: Output event data
+        run: echo "${{ toJSON(github.event) }}"
+      - name: Get code
+        uses: actions/checkout@v3
+      - name: Install dependencies
         run: npm ci
-      - name: Wait for release time
-        run: |
-          # Preuzmi korisničko vreme i trenutno vreme u UTC
-          release_time="${{ github.event.inputs.release-time }}"
-          current_time=$(date -u +"%H:%M")
-          
-          echo "Current time (UTC): $current_time"
-          echo "Target release time (UTC): $release_time"
-          
-          # Ako je trenutni trenutak manji od ciljanog vremena, čekaj
-          while [ "$current_time" != "$release_time" ]; do
-            echo "Waiting until $release_time..."
-            sleep 60  # Čekaj 1 minut
-            current_time=$(date -u +"%H:%M")
-          done
-          echo "It's time to deploy!"
-      - name: Deploy
+      - name: Test code
+        run: npm run test
+      - name: Build code
+        run: npm run build
+      - name: Deploy project
         run: echo "Deploying..."

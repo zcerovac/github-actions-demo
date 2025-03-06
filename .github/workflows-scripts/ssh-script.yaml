@@ -1,0 +1,45 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - master  # Ovaj workflow se pokreće kada se napravi push na master granu
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # Korak 1: Checkout koda iz repozitorijuma
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Korak 2: Setovanje SSH ključa za povezivanje sa serverom
+      - name: Set up SSH key
+        run: |
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      # Korak 3: Onemogućavanje provere hosta prilikom prvog povezivanja
+      - name: Disable SSH host key checking
+        run: |
+          echo -e "Host *\n\tStrictHostKeyChecking no\n\n" >> ~/.ssh/config
+
+      # Korak 4: Povezivanje sa serverom i izvršenje komandi
+      - name: Deploy to Production Server
+        run: |
+          ssh -o StrictHostKeyChecking=no user@prod-server-ip << 'EOF'
+            # Navigacija do direktorijuma sa aplikacijom
+            cd /path/to/your/app
+
+            # Preuzimanje najnovijih promena iz repozitorijuma
+            git pull origin master  # Ako koristiš Git za deployment
+
+            # Instalacija zavisnosti
+            npm install
+
+            # Restartovanje aplikacije (ako koristiš pm2, nodemon, ili neki drugi servis)
+            pm2 restart app  # Prilagodi kako je aplikacija postavljena
+
+          EOF
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}  # Privatni SSH ključ iz GitHub Secrets
